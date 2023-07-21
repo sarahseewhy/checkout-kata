@@ -16,7 +16,7 @@ Implement a checkout system similar to the one described in ["Back to the Checko
 - items: {item: count} = {"A": 1} 
 - price: {item: price(int)} = {"A": 30}
 - promotions (also an object): {item: promotion} = {"A": {3: 75}}, {"A": ?} 
--   * downside: what about basket promotions? Will handle that when in scope
+  * downside: what about basket promotions? Will handle that when in scope
 
 ## Pairing first steps
 
@@ -32,15 +32,15 @@ Only applicable if doing this in a pair:
 
 ## Checklist
 
-x Create a Checkout
-x Add an item to the checkout
-x Add price to the checkout
-x Calculate checkout total (single and multiple items)
-x Add a promotion
-  x If 3 of Item A are purchased, the price for all 3 is £75
+- Create a Checkout
+- Add an item to the checkout
+- Add price to the checkout
+- Calculate checkout total (single and multiple items)
+- Add a promotion
+  - If 3 of Item A are purchased, the price for all 3 is £75
   - If it's Friday there's a 50% off the checkout total
   - If 2 of Item B are purchased, the price for both is £35
   - If the total basket price (after previous discounts) is over £150, the basket receives a discount of £20
-x Apply promotion to total
+- Apply promotion to total
 - Exceptions: 
   - if item doesn't have a price
