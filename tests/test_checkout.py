@@ -58,12 +58,10 @@ def test_apply_multiple_discounts_to_checkout_total(checkout):
     checkout.add_promotion("A", 3, 75)
     checkout.add_price("A", 30)
 
-    checkout.add_item("A")
-    checkout.add_item("A")
-    checkout.add_item("A")
-    checkout.add_item("A")
-    checkout.add_item("A")
-    checkout.add_item("A")
+    even_number_of_items = ["A", "A", "A", "A", "A", "A"]
+
+    for item in even_number_of_items:
+        checkout.add_item(item)
 
     assert checkout.calculate_total() == 150
 
@@ -72,13 +70,9 @@ def test_apply_multiple_discounts_to_checkout_total_including_remaining_items(ch
     checkout.add_promotion("A", 3, 75)
     checkout.add_price("A", 30)
 
-    items = ["A", "A", "A", "A", "A", "A", "A"]
-    checkout.add_item("A")
-    checkout.add_item("A")
-    checkout.add_item("A")
-    checkout.add_item("A")
-    checkout.add_item("A")
-    checkout.add_item("A")
-    checkout.add_item("A")
+    odd_number_of_items = ["A", "A", "A", "A", "A", "A", "A"]
+
+    for item in odd_number_of_items:
+        checkout.add_item(item)
 
     assert checkout.calculate_total() == 180
