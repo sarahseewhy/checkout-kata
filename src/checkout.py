@@ -14,8 +14,15 @@ class PromotionCalculator:
         return sub_total
 
 
+class CheckoutPromotion:
+    def __init__(self, criteria, discount):
+        self.criteria = criteria
+        self.discount = discount
+
+
 class Checkout:
     def __init__(self):
+        self.checkout_promotions = {}
         self.promotions = {}
         self.prices = {}
         self.items = {}
@@ -44,3 +51,7 @@ class Checkout:
     def add_promotion(self, item, unit, price):
         promotion = Promotion(unit, price)
         self.promotions[item] = promotion
+
+    def add_checkout_promotion(self, promo_type, criteria, discount):
+        checkout_promotion = CheckoutPromotion(criteria, discount)
+        self.checkout_promotions[promo_type] = checkout_promotion

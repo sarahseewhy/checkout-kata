@@ -115,3 +115,12 @@ def test_promotion_calculator_calculates_multi_item_promotion(checkout):
     discounted_total = promotion_calculator.calculate_multi_item_promotion(item, item_count, item_price, starting_total, promotions)
 
     assert discounted_total == 75
+
+
+def test_checkout_can_add_checkout_promotions(checkout):
+    promo_type = "day_of_the_week"
+    criteria = "Friday"
+    discount = .5
+    checkout.add_checkout_promotion(promo_type, criteria, discount)
+
+    assert "day_of_the_week" in checkout.checkout_promotions
