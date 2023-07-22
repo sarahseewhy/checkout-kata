@@ -14,7 +14,7 @@ def test_add_item_to_checkout(checkout):
     assert "A" in checkout.items
 
 
-def test_add_item_to_checkout_and_record_count(checkout):
+def test_record_item_count_in_checkout(checkout):
     checkout.add_item("A")
     checkout.add_item("A")
 
@@ -27,7 +27,7 @@ def test_add_price_to_checkout(checkout):
     assert checkout.prices["A"] == 30
 
 
-def test_calculate_checkout_total(checkout):
+def test_calculate_checkout_total_for_multiple_different_items(checkout):
     checkout.add_price("A", 30)
     checkout.add_price("B", 20)
 
@@ -43,7 +43,7 @@ def test_add_promotion_to_checkout(checkout):
     assert checkout.promotions["A"].price == 75
 
 
-def test_apply_promotion_to_checkout_total(checkout):
+def test_apply_single_promotion_to_odd_number_of_items(checkout):
     checkout.add_promotion("A", 3, 75)
     checkout.add_price("A", 30)
 
@@ -54,7 +54,19 @@ def test_apply_promotion_to_checkout_total(checkout):
     assert checkout.calculate_total() == 75
 
 
-def test_apply_multiple_discounts_to_checkout_total(checkout):
+def test_apply_single_promotion_to_even_number_of_items(checkout):
+    checkout.add_promotion("A", 3, 75)
+    checkout.add_price("A", 30)
+
+    checkout.add_item("A")
+    checkout.add_item("A")
+    checkout.add_item("A")
+    checkout.add_item("A")
+
+    assert checkout.calculate_total() == 105
+
+
+def test_apply_multiple_promotions_to_even_number_of_items(checkout):
     checkout.add_promotion("A", 3, 75)
     checkout.add_price("A", 30)
 
@@ -66,7 +78,7 @@ def test_apply_multiple_discounts_to_checkout_total(checkout):
     assert checkout.calculate_total() == 150
 
 
-def test_apply_multiple_discounts_to_checkout_total_including_remaining_items(checkout):
+def test_apply_multiple_promotions_to_odd_number_of_items(checkout):
     checkout.add_promotion("A", 3, 75)
     checkout.add_price("A", 30)
 
