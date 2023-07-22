@@ -102,9 +102,6 @@ def test_apply_promotion_to_different_items(checkout):
 
     assert checkout.calculate_total() == 95
 
-def test_create_promotion_calculator():
-    promo_calculator = PromotionCalculator()
-
 
 def test_promotion_calculator_calculates_multi_item_promotion(checkout):
     item_count = 3
