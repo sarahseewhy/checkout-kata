@@ -90,6 +90,18 @@ def test_apply_multiple_promotions_to_odd_number_of_items(checkout):
     assert checkout.calculate_total() == 180
 
 
+def test_apply_promotion_to_different_items(checkout):
+    checkout.add_promotion("A", 3, 75)
+    checkout.add_price("A", 30)
+    checkout.add_price("B", 20)
+
+    items = ["A", "A", "A", "B"]
+
+    for item in items:
+        checkout.add_item(item)
+
+    assert checkout.calculate_total() == 95
+
 def test_create_promotion_calculator():
     promo_calculator = PromotionCalculator()
 
