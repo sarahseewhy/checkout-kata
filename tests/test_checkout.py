@@ -1,6 +1,6 @@
 import pytest
 
-from src.checkout import Checkout
+from src.checkout import Checkout, PromotionCalculator, Promotion
 
 
 @pytest.fixture
@@ -88,3 +88,21 @@ def test_apply_multiple_promotions_to_odd_number_of_items(checkout):
         checkout.add_item(item)
 
     assert checkout.calculate_total() == 180
+
+
+def test_create_promotion_calculator():
+    promo_calculator = PromotionCalculator()
+
+
+def test_promotion_calculator_calculates_multi_item_promotion(checkout):
+    item_count = 3
+    item = "A"
+    item_price = 30
+    starting_total = 0
+    promotion = Promotion(3, 75)
+    promotions = {item: promotion}
+    promotion_calculator = PromotionCalculator()
+
+    discounted_total = promotion_calculator.calculate_multi_item_promotion(item, item_count, item_price, starting_total, promotions)
+
+    assert discounted_total == 75

@@ -4,6 +4,16 @@ class Promotion:
         self.price = price
 
 
+class PromotionCalculator:
+    @staticmethod
+    def calculate_multi_item_promotion(item, count, item_price, sub_total, promotions):
+        applied_promotions = count // promotions[item].unit_count
+        sub_total += promotions[item].price * applied_promotions
+        remaining_items = count % promotions[item].unit_count
+        sub_total += remaining_items * item_price
+        return sub_total
+
+
 class Checkout:
     def __init__(self):
         self.promotions = {}
