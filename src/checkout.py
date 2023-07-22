@@ -31,14 +31,11 @@ class Checkout:
 
     def calculate_total(self):
         total = 0
-
+        promo_calculator = PromotionCalculator()
         for item, count in self.items.items():
             promotions = self.promotions
             if item in promotions:
-                applied_promotions = count // promotions[item].unit_count
-                total += promotions[item].price * applied_promotions
-                remaining_items = count % promotions[item].unit_count
-                total += remaining_items * self.prices[item]
+                total = promo_calculator.calculate_multi_item_promotion(item, count, self.prices[item], total, promotions)
             else:
                 total += self.prices[item] * count
 
