@@ -47,19 +47,30 @@ class Checkout:
 
     def calculate_total(self):
         total = 0
+        checkout = self.items.items()
 
-        for item, count in self.items.items():
-            promotions = self.item_promotions
-            item_price = self.prices[item]
+        for item, count in checkout:
             if item in self.item_promotions:
-                total = self.item_promotions[item].calculate_promotion(total, item_price, count)
+                total = self.apply_item_promotion(count, item, total)
             else:
-                total += self.prices[item] * count
+                total = self.sum_items(count, item, total)
 
         if self.checkout_promotions:
-            for promo in self.checkout_promotions:
-                total = self.checkout_promotions[promo].calculate_promotion(total)
+            total = self.apply_checkouts_promotion(total)
 
+        return total
+
+    def apply_checkouts_promotion(self, total):
+        for promo in self.checkout_promotions:
+            total = self.checkout_promotions[promo].calculate_promotion(total)
+        return total
+
+    def sum_items(self, count, item, total):
+        total += self.prices[item] * count
+        return total
+
+    def apply_item_promotion(self, count, item, total):
+        total = self.item_promotions[item].calculate_promotion(total, self.prices[item], count)
         return total
 
     def add_item_promotion(self, item_promotion):
