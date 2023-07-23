@@ -1,7 +1,7 @@
 import pytest
 from freezegun import freeze_time
 
-from src.checkout import Checkout, PromotionCalculator, ItemPromotion, CheckoutPromotion
+from src.checkout import Checkout, PromotionCalculator, ItemPromotion, CheckoutPromotion, PromotionLibrary
 
 
 @pytest.fixture
@@ -52,11 +52,12 @@ def test_calculate_checkout_total_for_multiple_different_items(checkout):
     assert checkout.calculate_total() == 50
 
 
-def test_add_item_promotion_to_checkout(checkout):
+def test_add_item_promotion_to_promotion_library(checkout):
     promotion = ItemPromotion("A", 3, 75)
-    checkout.add_item_promotion(promotion)
+    promo_library = PromotionLibrary()
+    promo_library.add_item_promotion(promotion)
 
-    assert checkout.item_promotions["A"].price == 75
+    assert promo_library.item_promotions["A"].price == 75
 
 
 def test_apply_single_promotion_to_odd_number_of_items(checkout):
@@ -135,9 +136,10 @@ def test_promotion_calculator_calculates_multi_item_promotion(checkout):
 
 def test_checkout_can_add_checkout_promotions(checkout):
     day_promotion = CheckoutPromotion("day_of_the_week", "Friday", .5)
-    checkout.add_checkout_promotion(day_promotion)
+    promo_library = PromotionLibrary()
+    promo_library.add_checkout_promotion(day_promotion)
 
-    assert "day_of_the_week" in checkout.checkout_promotions
+    assert "day_of_the_week" in promo_library.checkout_promotions
 
 
 def test_promotion_calculator_applies_day_of_the_week_promotion_to_a_total(checkout, make_it_friday):
