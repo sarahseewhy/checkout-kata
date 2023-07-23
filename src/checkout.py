@@ -10,18 +10,18 @@ class Promotion:
 
 class PromotionCalculator:
     @staticmethod
-    def calculate_multi_item_promotion(item, count, item_price, sub_total, promotions):
-        applied_promotions = count // promotions[item].unit_count
-        sub_total += promotions[item].price * applied_promotions
-        remaining_items = count % promotions[item].unit_count
+    def calculate_item_promotion(sub_total, item, item_price, count, promotion):
+        applied_promotions = count // promotion[item].unit_count
+        sub_total += promotion[item].price * applied_promotions
+        remaining_items = count % promotion[item].unit_count
         sub_total += remaining_items * item_price
         return sub_total
 
     @staticmethod
-    def calculate_checkout_promotion(sub_total, checkout_promotions):
+    def calculate_checkout_promotion(sub_total, promotion):
         today = calendar.day_name[date.today().weekday()]
-        if today in checkout_promotions.criteria:
-            return int(sub_total * checkout_promotions.discount)
+        if today in promotion.criteria:
+            return int(sub_total * promotion.discount)
         return sub_total
 
 
@@ -34,7 +34,7 @@ class CheckoutPromotion:
 class Checkout:
     def __init__(self):
         self.checkout_promotions = {}
-        self.promotions = {}
+        self.item_promotions = {}
         self.prices = {}
         self.items = {}
 
@@ -52,22 +52,23 @@ class Checkout:
         promo_calculator = PromotionCalculator()
 
         for item, count in self.items.items():
-            promotions = self.promotions
+            promotions = self.item_promotions
+            item_price = self.prices[item]
             if item in promotions:
-                total = promo_calculator.calculate_multi_item_promotion(item, count, self.prices[item], total, promotions)
+                total = promo_calculator.calculate_item_promotion(total, item, item_price, count, promotions)
             else:
                 total += self.prices[item] * count
 
         if self.checkout_promotions:
             for promo in self.checkout_promotions:
-                promo_type = self.checkout_promotions[promo]
-                total = promo_calculator.calculate_checkout_promotion(total, promo_type)
+                promotion = self.checkout_promotions[promo]
+                total = promo_calculator.calculate_checkout_promotion(total, promotion)
 
         return total
 
-    def add_promotion(self, item, unit, price):
+    def add_item_promotion(self, item, unit, price):
         promotion = Promotion(unit, price)
-        self.promotions[item] = promotion
+        self.item_promotions[item] = promotion
 
     def add_checkout_promotion(self, promo_type, criteria, discount):
         checkout_promotion = CheckoutPromotion(criteria, discount)

@@ -53,13 +53,13 @@ def test_calculate_checkout_total_for_multiple_different_items(checkout):
 
 
 def test_add_promotion_to_checkout(checkout):
-    checkout.add_promotion("A", 3, 75)
+    checkout.add_item_promotion("A", 3, 75)
 
-    assert checkout.promotions["A"].price == 75
+    assert checkout.item_promotions["A"].price == 75
 
 
 def test_apply_single_promotion_to_odd_number_of_items(checkout):
-    checkout.add_promotion("A", 3, 75)
+    checkout.add_item_promotion("A", 3, 75)
 
     checkout.add_item("A")
     checkout.add_item("A")
@@ -69,7 +69,7 @@ def test_apply_single_promotion_to_odd_number_of_items(checkout):
 
 
 def test_apply_single_promotion_to_even_number_of_items(checkout):
-    checkout.add_promotion("A", 3, 75)
+    checkout.add_item_promotion("A", 3, 75)
 
     checkout.add_item("A")
     checkout.add_item("A")
@@ -80,7 +80,7 @@ def test_apply_single_promotion_to_even_number_of_items(checkout):
 
 
 def test_apply_multiple_promotions_to_even_number_of_items(checkout):
-    checkout.add_promotion("A", 3, 75)
+    checkout.add_item_promotion("A", 3, 75)
 
     six_items = ["A", "A", "A", "A", "A", "A"]
 
@@ -91,7 +91,7 @@ def test_apply_multiple_promotions_to_even_number_of_items(checkout):
 
 
 def test_apply_multiple_promotions_to_odd_number_of_items(checkout):
-    checkout.add_promotion("A", 3, 75)
+    checkout.add_item_promotion("A", 3, 75)
 
     seven_items = ["A", "A", "A", "A", "A", "A", "A"]
 
@@ -102,7 +102,7 @@ def test_apply_multiple_promotions_to_odd_number_of_items(checkout):
 
 
 def test_apply_promotion_to_different_items(checkout):
-    checkout.add_promotion("A", 3, 75)
+    checkout.add_item_promotion("A", 3, 75)
 
     items = ["A", "A", "A", "B"]
 
@@ -121,8 +121,8 @@ def test_promotion_calculator_calculates_multi_item_promotion(checkout):
     promotions = {item: promotion}
     promotion_calculator = PromotionCalculator()
 
-    discounted_total = promotion_calculator.calculate_multi_item_promotion(item, item_count, item_price, starting_total,
-                                                                           promotions)
+    discounted_total = promotion_calculator.calculate_item_promotion(starting_total, item, item_price, item_count,
+                                                                     promotions)
 
     assert discounted_total == 75
 
