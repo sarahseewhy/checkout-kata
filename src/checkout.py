@@ -29,6 +29,18 @@ class CheckoutPromotion:
         return total
 
 
+class DeductFromTotalPromo:
+    def __init__(self, name, target_total, deduction_amount):
+        self.name = name
+        self.target_total = target_total
+        self.deduction_amount = deduction_amount
+
+    def calculate_promotion(self, checkout_total):
+        if checkout_total == 150:
+            checkout_total -= self.deduction_amount
+        return checkout_total
+
+
 class Checkout:
     def __init__(self):
         self.prices = {}

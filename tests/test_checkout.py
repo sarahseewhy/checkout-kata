@@ -1,7 +1,7 @@
 import pytest
 from freezegun import freeze_time
 
-from src.checkout import Checkout, ItemPromotion, CheckoutPromotion
+from src.checkout import Checkout, ItemPromotion, CheckoutPromotion, DeductFromTotalPromo
 
 
 @pytest.fixture
@@ -179,3 +179,29 @@ def test_apply_new_two_for_thirtyfive_item_promotion(checkout):
 
     assert checkout.calculate_total() == 35
 
+
+def test_deduct_from_total_promotion_deducts_number_from_designated_total(checkout):
+    deduct_from_checkout_total = DeductFromTotalPromo("deduct_from_total", 150, 20)
+    total = 150
+    discounted_total = deduct_from_checkout_total.calculate_promotion(total)
+
+    assert discounted_total == 130
+
+
+def test_deduct_from_total_promotion_does_not_deduct_number_from_designated_total(checkout):
+    deduct_from_checkout_total = DeductFromTotalPromo("deduct_from_total", 150, 20)
+    total = 160
+
+    assert deduct_from_checkout_total.calculate_promotion(total) == 160
+
+
+def test_apply_deduct_twenty_from_checkout_total_of_one_hundred_fifty_promotion(checkout):
+    deduct_twenty = DeductFromTotalPromo("deduct_from_total", 150, 20)
+    checkout.add_checkout_promotion(deduct_twenty)
+    checkout.add_price("C", 50)
+
+    checkout.add_item("C")
+    checkout.add_item("C")
+    checkout.add_item("C")
+
+    assert checkout.calculate_total() == 130
