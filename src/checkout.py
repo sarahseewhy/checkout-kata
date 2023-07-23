@@ -3,9 +3,10 @@ from datetime import date
 
 
 class ItemPromotion:
-    def __init__(self, unit, price):
+    def __init__(self, item, unit, sale_price):
+        self.item_name = item
         self.unit_count = unit
-        self.price = price
+        self.price = sale_price
 
 
 class PromotionCalculator:
@@ -26,7 +27,8 @@ class PromotionCalculator:
 
 
 class CheckoutPromotion:
-    def __init__(self, criteria, discount):
+    def __init__(self, promo_type, criteria, discount):
+        self.promo_type = promo_type
         self.criteria = criteria
         self.discount = discount
 
@@ -66,10 +68,8 @@ class Checkout:
 
         return total
 
-    def add_item_promotion(self, item, unit, price):
-        promotion = ItemPromotion(unit, price)
-        self.item_promotions[item] = promotion
+    def add_item_promotion(self, item_promotion):
+        self.item_promotions[item_promotion.item_name] = item_promotion
 
-    def add_checkout_promotion(self, promo_type, criteria, discount):
-        checkout_promotion = CheckoutPromotion(criteria, discount)
-        self.checkout_promotions[promo_type] = checkout_promotion
+    def add_checkout_promotion(self, checkout_promotion):
+        self.checkout_promotions[checkout_promotion.promo_type] = checkout_promotion

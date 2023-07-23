@@ -52,14 +52,16 @@ def test_calculate_checkout_total_for_multiple_different_items(checkout):
     assert checkout.calculate_total() == 50
 
 
-def test_add_promotion_to_checkout(checkout):
-    checkout.add_item_promotion("A", 3, 75)
+def test_add_item_promotion_to_checkout(checkout):
+    promotion = ItemPromotion("A", 3, 75)
+    checkout.add_item_promotion(promotion)
 
     assert checkout.item_promotions["A"].price == 75
 
 
 def test_apply_single_promotion_to_odd_number_of_items(checkout):
-    checkout.add_item_promotion("A", 3, 75)
+    promotion = ItemPromotion("A", 3, 75)
+    checkout.add_item_promotion(promotion)
 
     checkout.add_item("A")
     checkout.add_item("A")
@@ -69,7 +71,8 @@ def test_apply_single_promotion_to_odd_number_of_items(checkout):
 
 
 def test_apply_single_promotion_to_even_number_of_items(checkout):
-    checkout.add_item_promotion("A", 3, 75)
+    promotion = ItemPromotion("A", 3, 75)
+    checkout.add_item_promotion(promotion)
 
     checkout.add_item("A")
     checkout.add_item("A")
@@ -80,7 +83,8 @@ def test_apply_single_promotion_to_even_number_of_items(checkout):
 
 
 def test_apply_multiple_promotions_to_even_number_of_items(checkout):
-    checkout.add_item_promotion("A", 3, 75)
+    promotion = ItemPromotion("A", 3, 75)
+    checkout.add_item_promotion(promotion)
 
     six_items = ["A", "A", "A", "A", "A", "A"]
 
@@ -91,7 +95,8 @@ def test_apply_multiple_promotions_to_even_number_of_items(checkout):
 
 
 def test_apply_multiple_promotions_to_odd_number_of_items(checkout):
-    checkout.add_item_promotion("A", 3, 75)
+    promotion = ItemPromotion("A", 3, 75)
+    checkout.add_item_promotion(promotion)
 
     seven_items = ["A", "A", "A", "A", "A", "A", "A"]
 
@@ -102,7 +107,8 @@ def test_apply_multiple_promotions_to_odd_number_of_items(checkout):
 
 
 def test_apply_promotion_to_different_items(checkout):
-    checkout.add_item_promotion("A", 3, 75)
+    promotion = ItemPromotion("A", 3, 75)
+    checkout.add_item_promotion(promotion)
 
     items = ["A", "A", "A", "B"]
 
@@ -117,7 +123,7 @@ def test_promotion_calculator_calculates_multi_item_promotion(checkout):
     item = "A"
     item_price = 30
     starting_total = 0
-    promotion = ItemPromotion(3, 75)
+    promotion = ItemPromotion("A", 3, 75)
     promotions = {item: promotion}
     promotion_calculator = PromotionCalculator()
 
@@ -128,47 +134,36 @@ def test_promotion_calculator_calculates_multi_item_promotion(checkout):
 
 
 def test_checkout_can_add_checkout_promotions(checkout):
-    promo_type = "day_of_the_week"
-    criteria = "Friday"
-    discount = .5
-    checkout.add_checkout_promotion(promo_type, criteria, discount)
+    day_promotion = CheckoutPromotion("day_of_the_week", "Friday", .5)
+    checkout.add_checkout_promotion(day_promotion)
 
     assert "day_of_the_week" in checkout.checkout_promotions
 
 
 def test_promotion_calculator_applies_day_of_the_week_promotion_to_a_total(checkout, make_it_friday):
-    promotions_calculator = PromotionCalculator()
+    promo_calculator = PromotionCalculator()
+    day_promotion = CheckoutPromotion("day_of_the_week", "Friday", .5)
     total_before_discount = 100
-    promo_type = "day_of_the_week"
-    criteria = "Friday"
-    discount = .5
-    checkout.add_checkout_promotion(promo_type, criteria, discount)
+    checkout.add_checkout_promotion(day_promotion)
 
-    total = promotions_calculator.calculate_checkout_promotion(total_before_discount,
-                                                               checkout.checkout_promotions[promo_type],
-                                                               )
+    total = promo_calculator.calculate_checkout_promotion(total_before_discount, day_promotion)
+
     assert total == 50
 
 
 def test_promotion_calculator_does_not_apply_day_of_the_week_promotion_to_a_total(checkout):
-    promotions_calculator = PromotionCalculator()
+    promo_calculator = PromotionCalculator()
+    day_promotion = CheckoutPromotion("day_of_the_week", "Friday", .5)
     total_before_discount = 100
-    promo_type = "day_of_the_week"
-    criteria = "Friday"
-    discount = .5
-    checkout.add_checkout_promotion(promo_type, criteria, discount)
+    checkout.add_checkout_promotion(day_promotion)
 
-    total = promotions_calculator.calculate_checkout_promotion(total_before_discount,
-                                                               checkout.checkout_promotions[promo_type],
-                                                               )
+    total = promo_calculator.calculate_checkout_promotion(total_before_discount, day_promotion)
     assert total == total_before_discount
 
 
 def test_checkout_calculates_total_with_checkout_promotion(checkout, make_it_friday):
-    promo_type = "day_of_the_week"
-    criteria = "Friday"
-    discount = .5
-    checkout.add_checkout_promotion(promo_type, criteria, discount)
+    day_promotion = CheckoutPromotion("day_of_the_week", "Friday", .5)
+    checkout.add_checkout_promotion(day_promotion)
 
     checkout.add_item("A")
     checkout.add_item("B")
