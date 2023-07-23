@@ -1,4 +1,5 @@
 import pytest
+from freezegun import freeze_time
 
 from src.checkout import Checkout, PromotionCalculator, Promotion
 
@@ -6,6 +7,13 @@ from src.checkout import Checkout, PromotionCalculator, Promotion
 @pytest.fixture
 def checkout():
     return Checkout()
+
+
+@pytest.fixture()
+def make_it_friday():
+    most_recent_friday = '2023-07-21'
+    with freeze_time(most_recent_friday):
+        yield
 
 
 def test_add_item_to_checkout(checkout):
@@ -112,7 +120,8 @@ def test_promotion_calculator_calculates_multi_item_promotion(checkout):
     promotions = {item: promotion}
     promotion_calculator = PromotionCalculator()
 
-    discounted_total = promotion_calculator.calculate_multi_item_promotion(item, item_count, item_price, starting_total, promotions)
+    discounted_total = promotion_calculator.calculate_multi_item_promotion(item, item_count, item_price, starting_total,
+                                                                           promotions)
 
     assert discounted_total == 75
 
@@ -124,3 +133,45 @@ def test_checkout_can_add_checkout_promotions(checkout):
     checkout.add_checkout_promotion(promo_type, criteria, discount)
 
     assert "day_of_the_week" in checkout.checkout_promotions
+
+
+def test_promotion_calculator_applies_day_of_the_week_discount_to_a_total(checkout, make_it_friday):
+    promotions_calculator = PromotionCalculator()
+    total_before_discount = 100
+    promo_type = "day_of_the_week"
+    criteria = "Friday"
+    discount = .5
+    checkout.add_checkout_promotion(promo_type, criteria, discount)
+
+    total = promotions_calculator.calculate_checkout_promotion(total_before_discount,
+                                                               checkout.checkout_promotions[promo_type],
+                                                               )
+    assert total == 50
+
+
+def test_promotion_calculator_does_not_apply_day_of_the_week_discount_to_a_total(checkout):
+    promotions_calculator = PromotionCalculator()
+    total_before_discount = 100
+    promo_type = "day_of_the_week"
+    criteria = "Friday"
+    discount = .5
+    checkout.add_checkout_promotion(promo_type, criteria, discount)
+
+    total = promotions_calculator.calculate_checkout_promotion(total_before_discount,
+                                                               checkout.checkout_promotions[promo_type],
+                                                               )
+    assert total == total_before_discount
+
+
+def test_checkout_calculates_total_with_checkout_promotion(checkout, make_it_friday):
+    promo_type = "day_of_the_week"
+    criteria = "Friday"
+    discount = .5
+    checkout.add_checkout_promotion(promo_type, criteria, discount)
+
+    checkout.add_price("A", 30)
+    checkout.add_price("B", 20)
+    checkout.add_item("A")
+    checkout.add_item("B")
+
+    assert checkout.calculate_total() == 25
