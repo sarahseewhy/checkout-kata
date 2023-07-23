@@ -2,7 +2,7 @@ import calendar
 from datetime import date
 
 
-class ItemPromotion:
+class MultiItemPromo:
     def __init__(self, item, unit, sale_price):
         self.item_name = item
         self.unit_count = unit
@@ -16,16 +16,16 @@ class ItemPromotion:
         return sub_total
 
 
-class CheckoutPromotion:
-    def __init__(self, name, criteria, discount):
+class DiscountDayPromo:
+    def __init__(self, name, discount_day, percent_discount):
         self.name = name
-        self.criteria = criteria
-        self.discount = discount
+        self.discount_day = discount_day
+        self.percent_discount = percent_discount
 
     def calculate_promotion(self, total):
         today = calendar.day_name[date.today().weekday()]
-        if today in self.criteria:
-            return int(total * self.discount)
+        if today == self.discount_day:
+            return int(total * self.percent_discount)
         return total
 
 
@@ -35,10 +35,10 @@ class DeductFromTotalPromo:
         self.target_total = target_total
         self.deduction_amount = deduction_amount
 
-    def calculate_promotion(self, checkout_total):
-        if checkout_total == 150:
-            checkout_total -= self.deduction_amount
-        return checkout_total
+    def calculate_promotion(self, total):
+        if total > 150:
+            total -= self.deduction_amount
+        return total
 
 
 class Checkout:

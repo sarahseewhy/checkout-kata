@@ -1,7 +1,7 @@
 import pytest
 from freezegun import freeze_time
 
-from src.checkout import Checkout, ItemPromotion, CheckoutPromotion, DeductFromTotalPromo
+from src.checkout import Checkout, MultiItemPromo, DiscountDayPromo, DeductFromTotalPromo
 
 
 @pytest.fixture
@@ -53,14 +53,14 @@ def test_calculate_checkout_total_for_multiple_different_items(checkout):
 
 
 def test_add_item_promotion_to_promotion_library(checkout):
-    promotion = ItemPromotion("A", 3, 75)
+    promotion = MultiItemPromo("A", 3, 75)
     checkout.add_item_promotion(promotion)
 
     assert checkout.item_promotions["A"].sale_price == 75
 
 
 def test_apply_single_promotion_to_odd_number_of_items(checkout):
-    promotion = ItemPromotion("A", 3, 75)
+    promotion = MultiItemPromo("A", 3, 75)
     checkout.add_item_promotion(promotion)
 
     checkout.add_item("A")
@@ -71,7 +71,7 @@ def test_apply_single_promotion_to_odd_number_of_items(checkout):
 
 
 def test_apply_single_promotion_to_even_number_of_items(checkout):
-    promotion = ItemPromotion("A", 3, 75)
+    promotion = MultiItemPromo("A", 3, 75)
     checkout.add_item_promotion(promotion)
 
     checkout.add_item("A")
@@ -83,7 +83,7 @@ def test_apply_single_promotion_to_even_number_of_items(checkout):
 
 
 def test_apply_multiple_promotions_to_even_number_of_items(checkout):
-    promotion = ItemPromotion("A", 3, 75)
+    promotion = MultiItemPromo("A", 3, 75)
     checkout.add_item_promotion(promotion)
 
     six_items = ["A", "A", "A", "A", "A", "A"]
@@ -95,7 +95,7 @@ def test_apply_multiple_promotions_to_even_number_of_items(checkout):
 
 
 def test_apply_multiple_promotions_to_odd_number_of_items(checkout):
-    promotion = ItemPromotion("A", 3, 75)
+    promotion = MultiItemPromo("A", 3, 75)
     checkout.add_item_promotion(promotion)
 
     seven_items = ["A", "A", "A", "A", "A", "A", "A"]
@@ -107,7 +107,7 @@ def test_apply_multiple_promotions_to_odd_number_of_items(checkout):
 
 
 def test_apply_promotion_to_different_items(checkout):
-    promotion = ItemPromotion("A", 3, 75)
+    promotion = MultiItemPromo("A", 3, 75)
     checkout.add_item_promotion(promotion)
 
     items = ["A", "A", "A", "B"]
@@ -119,14 +119,14 @@ def test_apply_promotion_to_different_items(checkout):
 
 
 def test_checkout_can_add_checkout_promotions(checkout):
-    day_promotion = CheckoutPromotion("day_promo", "Friday", .5)
+    day_promotion = DiscountDayPromo("day_promo", "Friday", .5)
     checkout.add_checkout_promotion(day_promotion)
 
     assert "day_promo" in checkout.checkout_promotions
 
 
 def test_checkout_calculates_total_with_checkout_promotion(checkout, make_it_friday):
-    day_promotion = CheckoutPromotion("day_promo", "Friday", .5)
+    day_promotion = DiscountDayPromo("day_promo", "Friday", .5)
     checkout.add_checkout_promotion(day_promotion)
 
     checkout.add_item("A")
@@ -136,42 +136,42 @@ def test_checkout_calculates_total_with_checkout_promotion(checkout, make_it_fri
 
 
 def test_item_promotion_applies_promotion_rules_to_total(checkout):
-    item_promo = ItemPromotion("A", 3, 75)
+    item_promo = MultiItemPromo("A", 3, 75)
     discounted_total = item_promo.calculate_promotion(0, 30, 3)
 
     assert discounted_total == 75
 
 
 def test_item_promotion_applies_promotion_rules_to_remaining_items(checkout):
-    item_promo = ItemPromotion("A", 3, 75)
+    item_promo = MultiItemPromo("A", 3, 75)
     discounted_total = item_promo.calculate_promotion(0, 30, 4)
 
     assert discounted_total == 105
 
 
 def test_item_promotion_does_not_apply_promotion_rules(checkout):
-    item_promo = ItemPromotion("A", 3, 75)
+    item_promo = MultiItemPromo("A", 3, 75)
     total = item_promo.calculate_promotion(0, 30, 2)
 
     assert total == 60
 
 
 def test_checkout_promotion_applies_promotion_rules_to_total(checkout, make_it_friday):
-    checkout_promo = CheckoutPromotion({}, "Friday", .5)
+    checkout_promo = DiscountDayPromo("discount_day", "Friday", .5)
     discounted_total = checkout_promo.calculate_promotion(100)
 
     assert discounted_total == 50
 
 
 def test_checkout_promotion_does_not_apply_promotion_rules(checkout):
-    checkout_promo = CheckoutPromotion({}, "Friday", .5)
+    checkout_promo = DiscountDayPromo("discount_day", "Friday", .5)
     total = checkout_promo.calculate_promotion(100)
 
     assert total == 100
 
 
 def test_apply_new_two_for_thirtyfive_item_promotion(checkout):
-    two_for_thirty_five = ItemPromotion("B", 2, 35)
+    two_for_thirty_five = MultiItemPromo("B", 2, 35)
     checkout.add_item_promotion(two_for_thirty_five)
 
     checkout.add_item("B")
@@ -182,17 +182,17 @@ def test_apply_new_two_for_thirtyfive_item_promotion(checkout):
 
 def test_deduct_from_total_promotion_deducts_number_from_designated_total(checkout):
     deduct_from_checkout_total = DeductFromTotalPromo("deduct_from_total", 150, 20)
-    total = 150
+    total = 160
     discounted_total = deduct_from_checkout_total.calculate_promotion(total)
 
-    assert discounted_total == 130
+    assert discounted_total == 140
 
 
 def test_deduct_from_total_promotion_does_not_deduct_number_from_designated_total(checkout):
     deduct_from_checkout_total = DeductFromTotalPromo("deduct_from_total", 150, 20)
-    total = 160
+    total = 150
 
-    assert deduct_from_checkout_total.calculate_promotion(total) == 160
+    assert deduct_from_checkout_total.calculate_promotion(total) == 150
 
 
 def test_apply_deduct_twenty_from_checkout_total_of_one_hundred_fifty_promotion(checkout):
@@ -203,5 +203,28 @@ def test_apply_deduct_twenty_from_checkout_total_of_one_hundred_fifty_promotion(
     checkout.add_item("C")
     checkout.add_item("C")
     checkout.add_item("C")
+    checkout.add_item("C")
 
-    assert checkout.calculate_total() == 130
+    assert checkout.calculate_total() == 180
+
+
+def test_apply_multi_buy_discounts_and_deduct_total_discount(checkout):
+    deduct_twenty = DeductFromTotalPromo("deduct_from_total", 150, 20)
+    three_for_seventy_five = MultiItemPromo("A", 3, 75)
+    two_for_thirty_five = MultiItemPromo("B", 2, 35)
+
+    promos = [three_for_seventy_five, two_for_thirty_five]
+
+    for promo in promos:
+        checkout.add_item_promotion(promo)
+
+    checkout.add_checkout_promotion(deduct_twenty)
+
+    checkout.add_price("C", 50)
+
+    items = ["A", "A", "A", "A", "B", "B", "C"]
+
+    for item in items:
+        checkout.add_item(item)
+
+    assert checkout.calculate_total() == 170
