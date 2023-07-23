@@ -2,7 +2,7 @@ import calendar
 from datetime import date
 
 
-class Promotion:
+class ItemPromotion:
     def __init__(self, unit, price):
         self.unit_count = unit
         self.price = price
@@ -67,7 +67,7 @@ class Checkout:
         return total
 
     def add_item_promotion(self, item, unit, price):
-        promotion = Promotion(unit, price)
+        promotion = ItemPromotion(unit, price)
         self.item_promotions[item] = promotion
 
     def add_checkout_promotion(self, promo_type, criteria, discount):

@@ -1,7 +1,7 @@
 import pytest
 from freezegun import freeze_time
 
-from src.checkout import Checkout, PromotionCalculator, Promotion
+from src.checkout import Checkout, PromotionCalculator, ItemPromotion, CheckoutPromotion
 
 
 @pytest.fixture
@@ -117,7 +117,7 @@ def test_promotion_calculator_calculates_multi_item_promotion(checkout):
     item = "A"
     item_price = 30
     starting_total = 0
-    promotion = Promotion(3, 75)
+    promotion = ItemPromotion(3, 75)
     promotions = {item: promotion}
     promotion_calculator = PromotionCalculator()
 
