@@ -168,3 +168,14 @@ def test_checkout_promotion_does_not_apply_promotion_rules(checkout):
     total = checkout_promo.calculate_promotion(100)
 
     assert total == 100
+
+
+def test_apply_new_two_for_thirtyfive_item_promotion(checkout):
+    two_for_thirty_five = ItemPromotion("B", 2, 35)
+    checkout.add_item_promotion(two_for_thirty_five)
+
+    checkout.add_item("B")
+    checkout.add_item("B")
+
+    assert checkout.calculate_total() == 35
+
