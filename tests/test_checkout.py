@@ -208,23 +208,20 @@ def test_apply_deduct_twenty_from_checkout_total_of_one_hundred_fifty_promotion(
     assert checkout.calculate_total() == 180
 
 
-def test_apply_multi_buy_discounts_and_deduct_total_discount(checkout):
-    deduct_twenty = DeductFromTotalPromo("deduct_from_total", 150, 20)
-    three_for_seventy_five = MultiItemPromo("A", 3, 75)
-    two_for_thirty_five = MultiItemPromo("B", 2, 35)
-
-    promos = [three_for_seventy_five, two_for_thirty_five]
-
-    for promo in promos:
-        checkout.add_item_promotion(promo)
-
-    checkout.add_checkout_promotion(deduct_twenty)
+def test_apply_multi_buy_discounts_and_deduct_total_discount_to_all_items(checkout):
+    checkout.add_item_promotion(MultiItemPromo("A", 3, 75))
+    checkout.add_item_promotion(MultiItemPromo("B", 2, 35))
+    checkout.add_checkout_promotion(DeductFromTotalPromo("deduct_from_total", 150, 20))
 
     checkout.add_price("C", 50)
 
+    # rules: four A's = 105, two B's = 35, C = 50.
+    # math: 105 + 35 + 50 = 190.
     items = ["A", "A", "A", "A", "B", "B", "C"]
 
     for item in items:
         checkout.add_item(item)
 
-    assert checkout.calculate_total() == 170
+    expected_total = 170
+
+    assert checkout.calculate_total() == expected_total
