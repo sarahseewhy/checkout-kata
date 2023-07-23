@@ -53,6 +53,20 @@ class Checkout:
         total = 0
         promo_calculator = PromotionCalculator()
 
+        total = self.apply_item_promotions(promo_calculator, total)
+
+        if self.checkout_promotions:
+            total = self.apply_checkout_promotions(promo_calculator, total)
+
+        return total
+
+    def apply_checkout_promotions(self, promo_calculator, total):
+        for promo in self.checkout_promotions:
+            promotion = self.checkout_promotions[promo]
+            total = promo_calculator.calculate_checkout_promotion(total, promotion)
+        return total
+
+    def apply_item_promotions(self, promo_calculator, total):
         for item, count in self.items.items():
             promotions = self.item_promotions
             item_price = self.prices[item]
@@ -60,12 +74,6 @@ class Checkout:
                 total = promo_calculator.calculate_item_promotion(total, item, item_price, count, promotions)
             else:
                 total += self.prices[item] * count
-
-        if self.checkout_promotions:
-            for promo in self.checkout_promotions:
-                promotion = self.checkout_promotions[promo]
-                total = promo_calculator.calculate_checkout_promotion(total, promotion)
-
         return total
 
     def add_item_promotion(self, item_promotion):
