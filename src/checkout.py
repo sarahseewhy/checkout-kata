@@ -68,11 +68,11 @@ class Checkout:
                 total = self.sum_items(count, item, total)
 
         if self.checkout_promotions:
-            total = self.apply_checkouts_promotion(total)
+            total = self.apply_checkout_promotion(total)
 
         return total
 
-    def apply_checkouts_promotion(self, total):
+    def apply_checkout_promotion(self, total):
         for promo in self.checkout_promotions:
             total = self.checkout_promotions[promo].calculate_promotion(total)
         return total
